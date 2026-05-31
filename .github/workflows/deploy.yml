@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      IMAGE_URI: ${{ steps.set-output.outputs.IMAGE_URI }}
+      IMAGE_URI: ${{ steps.export.outputs.IMAGE_URI }}
 
     steps:
       - name: Checkout Code
@@ -33,15 +33,17 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build, Tag & Push Image
-        id: set-output
+      - name: Build and Push Image
+        id: export
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          IMAGE_URI="$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-          docker build -t $IMAGE_URI .
-          docker push $IMAGE_URI
+          echo "Building: $IMAGE_URI"
+
+          docker build -t "$IMAGE_URI" .
+          docker push "$IMAGE_URI"
 
           echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_OUTPUT
 
@@ -56,13 +58,18 @@ jobs:
           docker stop ai-app || true
           docker rm ai-app || true
 
-      - name: Debug IMAGE URI
+      - name: Show IMAGE_URI (debug)
         run: |
-          echo "IMAGE_URI = ${{ needs.build-and-push.outputs.IMAGE_URI }}"
+          echo "${{ needs.build-and-push.outputs.IMAGE_URI }}"
 
-      - name: Pull and Run Docker Image
+      - name: Pull and Run
         run: |
-          IMAGE_URI="${{ needs.build-and-push.outputs.IMAGE_URI }}"
+          IMAGE_URI='${{ needs.build-and-push.outputs.IMAGE_URI }}'
+
+          if [ -z "$IMAGE_URI" ]; then
+            echo "ERROR: IMAGE_URI is empty"
+            exit 1
+          fi
 
           docker pull "$IMAGE_URI"
 
