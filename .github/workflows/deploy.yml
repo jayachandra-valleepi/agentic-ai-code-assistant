@@ -14,9 +14,6 @@ jobs:
   Continuous-Integration:
     runs-on: ubuntu-latest
 
-    outputs:
-      image_uri: ${{ steps.build-image.outputs.image_uri }}
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -49,25 +46,23 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Deploy container on EC2
+      - name: Stop old container
         run: |
-          echo "Stopping old container..."
           docker stop ai-app || true
           docker rm ai-app || true
 
-          echo "Logging into ECR..."
+      - name: Login to Amazon ECR
+        run: |
           aws ecr get-login-password --region $AWS_REGION \
           | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
 
-          echo "Pulling image..."
-          docker pull ${{ needs.Continuous-Integration.outputs.image_uri }}
-
-          echo "Running container..."
+      - name: Run Docker Image
+        run: |
           docker run -d \
             --name ai-app \
-            -p 8000:8000 \
-            -e OPENAI_API_KEY="${{ secrets.OPENAI_API_KEY }}" \
+            -p 8080:8080 \
             -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
             -e AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
             -e AWS_DEFAULT_REGION="${{ secrets.AWS_DEFAULT_REGION }}" \
+            -e OPENAI_API_KEY="${{ secrets.OPENAI_API_KEY }}" \
             ${{ needs.Continuous-Integration.outputs.image_uri }}
