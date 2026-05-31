@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic AI Coding Assistant</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <div class="app">
+
+        <aside class="sidebar">
+
+            <div class="logo">
+                🤖 Agentic AI
+            </div>
+
+            <button class="new-chat">
+                + New Chat
+            </button>
+
+            <div class="history">
+                <h3>Recent Chats</h3>
+
+                <div class="history-item">
+                    Python Debugging
+                </div>
+
+                <div class="history-item">
+                    SQL Queries
+                </div>
+
+                <div class="history-item">
+                    FastAPI Project
+                </div>
+            </div>
+
+        </aside>
+
+        <main class="main-content">
+
+            <div class="header">
+                <h1>Agentic AI Coding Assistant</h1>
+                <p>Code • Debug • Explain • Generate</p>
+            </div>
+
+            <div class="chat-box" id="chat-box">
+
+                <div class="welcome-card">
+                    <h2>👋 Welcome, Jay</h2>
+
+                    <p>
+                        Ask me anything about Python, SQL,
+                        FastAPI, LangChain, Docker, AWS,
+                        RAG, Data Engineering and more.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="input-wrapper">
+
+                <div class="input-container">
+
+                    <input
+                        type="text"
+                        id="message"
+                        placeholder="Ask a coding question..."
+                        onkeypress="if(event.key==='Enter') sendMessage()"
+                    >
+
+                    <button onclick="sendMessage()">
+                        🚀
+                    </button>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <script src="/static/script.js"></script>
+
+</body>
+
+</html>
